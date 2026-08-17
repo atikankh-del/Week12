@@ -12,7 +12,7 @@
                 <th scope="col">Title</th>
                 {{-- <th scope="col">Content</th> --}}
                 <th scope="col">Status</th>
-                <th scope="col">Delete</th>
+                <th scope="col">Action</th>
             </tr>
         </thead>
         <tbody>
@@ -21,19 +21,27 @@
                     <td>{{ $item->title }}</td>
                     {{-- <td>{{ $item->content }}</td> --}}
                     <td>
-                        @if ($item->status == 'active')
-                            <span class="btn btn-outline-success" style="padding: 5px 15px; min-width: 150px;">เผยแพร่</span>
-                        @else
-                            <span class="btn btn-outline-danger"
-                                style="padding: 5px 15px; min-width: 150px;">ไม่เผยแพร่</span>
-                        @endif
+                        <form action="{{ route('book.chang', $item->id) }}" method="POST" class="status-form">
+                            @csrf
+                            @method('DELETE')
+
+                            <button type="submit"
+                                class="btn status-btn {{ $item->status == 'active' ? 'btn-outline-success' : 'btn-outline-danger' }}"
+                                style="padding: 5px 15px; min-width: 150px;">
+                                {{ $item->status == 'active' ? 'เผยแพร่' : 'ไม่เผยแพร่' }}
+                            </button>
+                        </form>
                     </td>
                     <td>
-                        <form action="{{ route('book.delete', $item->id) }}" method="POST">
+                        <a href="{{ route('book.edit', $item->id) }}" class="btn btn-warning" title="แก้ไข">
+                            <i class="bi bi-pencil-fill" style="color: white"></i>
+                        </a>
+
+                        <form action="{{ route('book.delete', $item->id) }}" method="POST" style="display: inline;">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger"
-                                onclick="return confirm('คุณต้องการลบบทความนี้หรือไม่')">
+                                onclick="return confirm('คุณต้องการลบบทความนี้หรือไม่')" title="ลบ">
                                 <i class="bi bi-trash-fill" style="color: white"></i>
                             </button>
                         </form>
@@ -42,6 +50,52 @@
             @endforeach
         </tbody>
     </table>
+
     <br>
+
     <a class="btn btn-dark" href="{{ route('form') }}">+ เขียนบทความ</a>
+
+    <script>
+        document.querySelectorAll('.status-form').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const button = form.querySelector('.status-btn');
+                const token = form.querySelector('input[name="_token"]').value;
+                const url = form.action;
+
+                fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRF-TOKEN': token,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: '_token=' + encodeURIComponent(token) + '&_method=DELETE'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('เกิดข้อผิดพลาด');
+                        }
+
+                        return response.text();
+                    })
+                    .then(() => {
+                        if (button.textContent.trim() === 'เผยแพร่') {
+                            button.textContent = 'ไม่เผยแพร่';
+                            button.classList.remove('btn-outline-success');
+                            button.classList.add('btn-outline-danger');
+                        } else {
+                            button.textContent = 'เผยแพร่';
+                            button.classList.remove('btn-outline-danger');
+                            button.classList.add('btn-outline-success');
+                        }
+                    })
+                    .catch(error => {
+                        alert('ไม่สามารถเปลี่ยนสถานะได้');
+                        console.error(error);
+                    });
+            });
+        });
+    </script>
 @endsection

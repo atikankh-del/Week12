@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -8,14 +9,48 @@ class AdminController extends Controller
 {
     function blog()
     {
-        $blog = DB::table("blogs")->get();
+        $blog = DB::table('blogs')->get();
         return view('blog', compact('blog'));
     }
 
     function delete($id)
     {
-        DB::table("blogs")->where("id", $id)->delete();
-        return redirect("blog");
+        DB::table('blogs')->where('id', $id)->delete();
+        return redirect('blog');
+    }
+
+    function edit($id)
+    {
+        $blog = DB::table('blogs')->where('id', $id)->first();
+        return view('edit', compact('blog'));
+    }
+
+    function update(Request $request, $id)
+    {
+        $request->validate(
+            [
+                'title' => 'required|max:50',
+                'content' => 'required',
+                'status' => 'required',
+            ],
+            [
+                'title.required' => 'กรุณากรอกชื่อบทความ',
+                'title.max' => 'ชื่อบทความต้องไม่เกิน 50 ตัวอักษร',
+                'content.required' => 'กรุณากรอกเนื้อหาบทความ',
+                'status.required' => 'กรุณากรอกสถานะบทความ',
+            ],
+        );
+
+        $data = [
+            'title' => $request->title,
+            'content' => $request->content,
+            'status' => $request->status,
+        ];
+        
+
+        DB::table('blogs')->where('id', $id)->update($data);
+
+        return redirect('blog');
     }
 
     function about()
@@ -43,13 +78,15 @@ class AdminController extends Controller
                 'status.required' => 'กรุณากรอกสถานะบทความ',
             ],
         );
+
         $data = [
             'title' => $request->title,
             'content' => $request->content,
             'status' => $request->status,
         ];
-        dd($data);
+
         DB::table('blogs')->insert($data);
+
         return redirect('blog');
     }
 
@@ -57,5 +94,25 @@ class AdminController extends Controller
     {
         return view('form');
     }
-    
+
+    function changestatus(Request $request, $id)
+    {
+        $blog = DB::table('blogs')->where('id', $id)->first();
+
+        if ($blog->status === 'active') {
+            $status = 'inactive';
+        } else {
+            $status = 'active';
+        }
+
+        DB::table('blogs')
+            ->where('id', $id)
+            ->update(['status' => $status]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'status' => $status]);
+        }
+
+        return redirect('blog');
+    }
 }

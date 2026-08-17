@@ -1,5 +1,7 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BookController;
 
@@ -19,9 +21,7 @@ Route::get('/books', [BookController::class, 'index'])->name('book');
 
 Route::post('/books', [BookController::class, 'store'])->name('book.store');
 
-use Illuminate\Support\Facades\DB;
-
-Route::get('test_db', function () {
+Route::get('/test_db', function () {
     try {
         DB::connection('mysql')->getPdo();
         return "เชื่อมต่อฐานข้อมูลสำเร็จ";
@@ -30,4 +30,10 @@ Route::get('test_db', function () {
     }
 });
 
+Route::get('/edit/{id}', [AdminController::class, 'edit'])->name('book.edit');
+
+Route::put('/update/{id}', [AdminController::class, 'update'])->name('book.update');
+
 Route::delete('/delete/{id}', [AdminController::class, 'delete'])->name('book.delete');
+
+Route::delete('/chang/{id}', [AdminController::class, 'changestatus'])->name('book.chang');
