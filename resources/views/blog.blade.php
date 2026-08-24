@@ -6,6 +6,8 @@
 
 @section('content')
     <h2>บทความทั้งหมด</h2>
+
+    @if (count($blogs) > 0)
     <table class="table table-bordered text-center">
         <thead class="table-info">
             <tr>
@@ -16,7 +18,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($blog as $item)
+            @foreach ($blogs as $item)
                 <tr>
                     <td>{{ $item->title }}</td>
                     {{-- <td>{{ $item->content }}</td> --}}
@@ -34,7 +36,7 @@
                     </td>
                     <td>
                         <a href="{{ route('book.edit', $item->id) }}" class="btn btn-warning" title="แก้ไข">
-                            <i class="bi bi-pencil-fill" style="color: white"></i>
+                            <i class="bi bi-pencil-fill"></i>
                         </a>
 
                         <form action="{{ route('book.delete', $item->id) }}" method="POST" style="display: inline;">
@@ -50,6 +52,13 @@
             @endforeach
         </tbody>
     </table>
+
+    <div class="d-flex justify-content-center">
+        {{ $blogs->links() }}
+    </div>
+    @else
+        <h2 class="text-center py-2">ไม่มีบทความ</h2>
+    @endif
 
     <br>
 

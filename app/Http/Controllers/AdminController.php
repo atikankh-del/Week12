@@ -9,8 +9,11 @@ class AdminController extends Controller
 {
     function blog()
     {
-        $blog = DB::table('blogs')->get();
-        return view('blog', compact('blog'));
+        $blogs = DB::table('blogs')
+            ->orderBy('id')
+            ->paginate(10);
+
+        return view('blog', compact('blogs'));
     }
 
     function delete($id)
