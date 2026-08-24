@@ -46,7 +46,7 @@ class AdminController extends Controller
             'content' => $request->content,
             'status' => $request->status,
         ];
-        
+
 
         DB::table('blogs')->where('id', $id)->update($data);
 
