@@ -7,7 +7,7 @@ use App\Http\Controllers\BookController;
 
 Route::get('/', function () {
     return view('index');
-})->name('home');
+})->name('welcome');
 
 Route::get('/about', [AdminController::class, 'about'])->name('about');
 
@@ -37,3 +37,6 @@ Route::put('/update/{id}', [AdminController::class, 'update'])->name('book.updat
 Route::delete('/delete/{id}', [AdminController::class, 'delete'])->name('book.delete');
 
 Route::delete('/chang/{id}', [AdminController::class, 'changestatus'])->name('book.chang');
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

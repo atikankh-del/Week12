@@ -9,9 +9,7 @@ class AdminController extends Controller
 {
     function blog()
     {
-        $blogs = DB::table('blogs')
-            ->orderBy('id')
-            ->paginate(10);
+        $blogs = DB::table('blogs')->orderBy('id')->paginate(10);
 
         return view('blog', compact('blogs'));
     }
@@ -49,7 +47,6 @@ class AdminController extends Controller
             'content' => $request->content,
             'status' => $request->status,
         ];
-
 
         DB::table('blogs')->where('id', $id)->update($data);
 
@@ -117,5 +114,10 @@ class AdminController extends Controller
         }
 
         return redirect('blog');
+    }
+
+    function __construct()
+    {
+        $this->middleware('auth');
     }
 }
